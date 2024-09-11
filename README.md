@@ -1,2 +1,2 @@
 # ImgAT
-ImageAnalyeTool（图片分析工具）
+ImageAnalyzeTool（图片分析工具）
