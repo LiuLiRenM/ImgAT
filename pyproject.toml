@@ -10,6 +10,17 @@ readme = "README.md"
 python = "^3.9"
 fastapi = "^0.114.1"
 uvicorn = "^0.30.6"
+pydantic = "^2.9.1"
+loguru = "^0.7.2"
+sqlalchemy = "^2.0.34"
+redis = "^5.0.8"
+pytz = "^2024.2"
+pillow = "^10.4.0"
+nudenet = "^3.4.2"
+cython = "^3.0.11"
+pymysql = "^1.1.1"
+cryptography = "^43.0.1"
+tqdm = "^4.66.5"
 
 
 [build-system]
