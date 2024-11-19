@@ -18,16 +18,12 @@ class NsfwType(Enum):
     识别到的NSFW类型
 
     """
-    FEMALE_GENITALIA_COVERED = (1, 'FEMALE_GENITALIA_COVERED')
-    BUTTOCKS_EXPOSED = (2, 'BUTTOCKS_EXPOSED')
-    FEMALE_BREAST_EXPOSED = (3, 'FEMALE_BREAST_EXPOSED')
-    FEMALE_GENITALIA_EXPOSED = (4, 'FEMALE_GENITALIA_EXPOSED')
-    MALE_BREAST_EXPOSED = (5, 'MALE_BREAST_EXPOSED')
-    ANUS_EXPOSED = (6, 'ANUS_EXPOSED')
-    MALE_GENITALIA_EXPOSED = (7, 'MALE_GENITALIA_EXPOSED')
-    ANUS_COVERED = (8, 'ANUS_COVERED')
-    FEMALE_BREAST_COVERED = (9, 'FEMALE_BREAST_COVERED')
-    BUTTOCKS_COVERED = (10, 'BUTTOCKS_COVERED')
+    BUTTOCKS_EXPOSED = (1, 'BUTTOCKS_EXPOSED')
+    FEMALE_BREAST_EXPOSED = (2, 'FEMALE_BREAST_EXPOSED')
+    FEMALE_GENITALIA_EXPOSED = (3, 'FEMALE_GENITALIA_EXPOSED')
+    MALE_BREAST_EXPOSED = (4, 'MALE_BREAST_EXPOSED')
+    ANUS_EXPOSED = (5, 'ANUS_EXPOSED')
+    MALE_GENITALIA_EXPOSED = (6, 'MALE_GENITALIA_EXPOSED')
 
     @classmethod
     def is_exist(cls, name: str) -> bool:
@@ -38,3 +34,42 @@ class NsfwType(Enum):
         :return:
         """
         return name in cls.__members__
+
+
+class TaskStatus(str, Enum):
+    """
+    任务状态类型
+
+    """
+    PENDING = "pending"
+    FETCHING = "fetching"
+    PROCESSING = "processing"
+    SAVING = "saving"
+    FINISHED = "finished"
+    ERROR = "error"
+    SCHEDULED = "scheduled"
+    SKIPPED = "skipped"
+    UNAVAILABLE = "unavailable"
+
+
+class PredCategories(str, Enum):
+    """
+    预测类别
+
+    """
+    NSFW = 'nsfw'
+    SAFE = 'safe'
+
+
+class SubPredCategories(str, Enum):
+    """
+    预测类别的子类
+
+    """
+    NSFW_CARTOON = 'nsfw_cartoon'
+    NSFW_NUDITY = 'nsfw_nudity'
+    NSFW_PORN = 'nsfw_porn'
+    NSFW_SUGGESTIVE = 'nsfw_suggestive'
+    SAFE_CARTOON = 'safe_cartoon'
+    SAFE_GENERAL = 'safe_general'
+    SAFE_PERSON = 'safe_person'

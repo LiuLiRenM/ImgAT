@@ -4,7 +4,7 @@
 """
 import warnings
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional, List, Dict, Tuple
 
 from PIL import Image
 from PIL.Image import DecompressionBombWarning
@@ -45,6 +45,21 @@ class ImageService:
             logger.error('The file {} not a image.', file_path.as_posix())
             return image
 
+    @staticmethod
+    def update_image_info(file_path: Path, exist: ImageInfo):
+        """
+        更新
+
+        :param file_path:
+        :param exist:
+        :return:
+        """
+        # 读取文件内容
+        content = FileUtil.get_file_content(file_path=file_path)
+        detect_result = NsfwUtil.detect(file_content=content)
+        exist.is_nsfw = detect_result.is_nsfw
+        exist.nsfw_original_result = detect_result.original_result
+
     def create_image_info(self, file_path: Path) -> Optional[ImageInfo]:
         """
         创建image_info记录
@@ -74,26 +89,33 @@ class ImageService:
         image_info_record.nsfw_original_result = detect_result.original_result
         return image_info_record
 
-    def generate_image_info(self, dir_path: Path, exist_full_path_list) -> List[ImageInfo]:
+    def generate_image_info(self, dir_path: Path, exist_map: Dict[str, ImageInfo],
+                            is_refresh: bool) -> Tuple[List[ImageInfo], List[ImageInfo]]:
         """
         生成图片信息，MD5值，长宽等信息
 
-        :param exist_full_path_list:
+        :param is_refresh: 是否更新已存在数据
+        :param exist_map:
         :param dir_path: 图片所在路径
         :return:
         """
-        record_list = list()
-        pbar = tqdm(list(dir_path.rglob('*')), file=open(self.tqdm_log_path, 'a', encoding='utf-8'))
-        for file_path in pbar:
-            pbar.set_description('Processing file: {}'.format(file_path.as_posix()))
-            if file_path.as_posix() in exist_full_path_list:
+        to_add_list = list()
+        to_update_list = list()
+        for file_path in dir_path.rglob('*'):
+            logger.debug('Deal with {}', file_path.as_posix())
+            if file_path.as_posix() in exist_map.keys() and not is_refresh:
                 logger.info('The file {} has been stored.', file_path.as_posix())
                 continue
-            record = self.create_image_info(file_path=file_path)
-            if record is None:
-                continue
-            record_list.append(record)
-        return record_list
+            exist = exist_map.get(file_path.as_posix())
+            if exist:
+                self.update_image_info(file_path=file_path, exist=exist)
+                to_update_list.append(exist)
+            else:
+                record = self.create_image_info(file_path=file_path)
+                if record is None:
+                    continue
+                to_add_list.append(record)
+        return to_add_list, to_update_list
 
 
 image_service = ImageService()

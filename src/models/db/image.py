@@ -21,6 +21,7 @@ class ImageInfo(Base):
     nsfw_original_result = Column(JSON, nullable=False, comment='NSFW审查原始结果')
     width = Column(Integer, nullable=False, comment='图片宽度')
     height = Column(Integer, nullable=False, comment='图片长度')
+    is_suit_as_wallpaper = Column(Boolean, default=0, comment='是否适合用作壁纸，0：否，1：是')
     hash_value = Column(String(32), nullable=False, comment='图片hash值')
     created_time = Column(DateTime, nullable=False, comment='创建时间')
     updated_time = Column(DateTime, comment='更新时间')
