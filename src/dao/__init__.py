@@ -5,6 +5,7 @@
 from typing import TypeVar, Generic, List
 
 from loguru import logger
+from objtyping import to_primitive
 
 from src.models.db import Base, session
 from src.utils.date_util import DateUtil
@@ -85,4 +86,50 @@ class BaseDAO(Generic[T]):
             return models
         except Exception as e:
             logger.error('Bulk save error: {}', e)
+            self.session.rollback()
+
+    def update_one(self, model: T) -> T:
+        """
+        更新指定数据
+
+        :param model:
+        :return:
+        """
+        try:
+            # 添加更新时间
+            if hasattr(model, self.update_time_field):
+                setattr(model, self.update_time_field, DateUtil.get_now())
+            self.session.merge(model)
+            self.session.commit()
+            return model
+        except Exception as e:
+            logger.error('Update error: {}', e)
+            self.session.rollback()
+
+    def update_bulk(self, t: T, models: List[T], batch_size: int = 1000) -> List[T]:
+        """
+        批量更新
+
+        :param t:
+        :param models:
+        :param batch_size:
+        :return:
+        """
+        to_update_list = list()
+        for model in models:
+            # 添加更新时间
+            if hasattr(model, self.update_time_field):
+                setattr(model, self.update_time_field, DateUtil.get_now())
+            to_update_list.append(to_primitive(model))
+        try:
+            if len(models) < batch_size:
+                self.session.bulk_update_mappings(mapper=t, mappings=to_update_list)
+            else:
+                for sub_list in self.chunks(lst=to_update_list, n=batch_size):
+                    self.session.bulk_update_mappings(mapper=t, mappings=sub_list)
+            self.session.commit()
+            return models
+        except Exception as e:
+            logger.error('Bulk update error: {}', e)
+            logger.exception(e)
             self.session.rollback()
